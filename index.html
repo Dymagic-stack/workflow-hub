@@ -138,19 +138,87 @@ body{padding:0 0 env(safe-area-inset-bottom);min-height:100dvh}
 </head>
 <body>
 <div class="app" id="app"></div>
-<script>
-(function(){
-"use strict";
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB_1WIDAnWVi5HO0CzFc3sUS8yomEDXvgs",
+  authDomain: "workflow-hub-8b61c.firebaseapp.com",
+  projectId: "workflow-hub-8b61c",
+  storageBucket: "workflow-hub-8b61c.firebasestorage.app",
+  messagingSenderId: "673301872066",
+  appId: "1:673301872066:web:b37c808ea673accdf46a5b",
+  measurementId: "G-KYQLTFKMBC"
+};
+
+// Initialisiere Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const provider = new GoogleAuthProvider();
 
 var DB="wfhub_v2";
 function load(){try{return JSON.parse(localStorage.getItem(DB))||{workflows:[],checks:{}}}catch(e){return{workflows:[],checks:{}}}}
 function save(d){try{localStorage.setItem(DB,JSON.stringify(d))}catch(e){}}
 function isC(d,k){return !!d.checks[k]}
-function togC(d,k){if(d.checks[k])delete d.checks[k];else d.checks[k]=1;save(d)}
+function togC(d,k){if(d.checks[k])delete d.checks[k];else d.checks[k]=1;save(d);R()}
 
 var data=load();
+var currentUser = null;
 var view="hub",curWf=null,curVar=0,curTab="wf",editIdx=null,builder=null;
 var $=document.getElementById("app");
+
+// ── FIREBASE AUTH & CLOUD SYNC ──
+onAuthStateChanged(auth, async (user) => {
+  currentUser = user;
+  if (user) {
+    await syncFromCloud();
+  } else {
+    data.workflows = load().workflows; // Lade lokale Daten, wenn ausgeloggt
+  }
+  R();
+});
+
+async function login() {
+  try { await signInWithPopup(auth, provider); } catch (e) { console.error("Login Fehler:", e); }
+}
+
+async function logout() {
+  await signOut(auth);
+  location.reload();
+}
+
+async function syncFromCloud() {
+  if (!currentUser) return;
+  const q = query(collection(db, "workflows"), where("authorId", "==", currentUser.uid));
+  const snap = await getDocs(q);
+  data.workflows = snap.docs.map(d => ({ fbId: d.id, ...d.data() }));
+  save(data); // Aktualisiere den lokalen Cache
+  R();
+}
+
+async function cloudSave(workflow) {
+  if (!currentUser) return; // Wenn nicht eingeloggt, wird es ohnehin lokal durch save(data) gespeichert
+  const wfData = { ...workflow, authorId: currentUser.uid };
+  const id = wfData.fbId;
+  delete wfData.fbId; // ID nicht ins Dokument mit abspeichern
+
+  if (id) {
+    await updateDoc(doc(db, "workflows", id), wfData);
+  } else {
+    await addDoc(collection(db, "workflows"), wfData);
+  }
+  await syncFromCloud();
+}
+
+async function cloudDelete(workflow) {
+  if (!currentUser || !workflow.fbId) return;
+  await deleteDoc(doc(db, "workflows", workflow.fbId));
+  await syncFromCloud();
+}
 
 function R(){
   if(view==="hub")rHub();
@@ -162,9 +230,18 @@ function esc(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').re
 
 // ── HUB ──
 function rHub(){
-  data=load();var n=data.workflows.length;
+  var n=data.workflows.length;
   var h='<div class="hdr"><div><h1>Workflow Hub<i>.</i></h1>';
-  h+='<div class="hdr-sub mono">'+n+' workflow'+(n!==1?'s':'')+' gespeichert</div></div></div>';
+  
+  // LOGIN / LOGOUT BUTTON
+  if (!currentUser) {
+    h += '<button class="btn btn-ac btn-sm" id="btn-login" style="margin-top:6px">Login mit Google</button>';
+  } else {
+    h += '<div class="hdr-sub">Eingeloggt als ' + esc(currentUser.displayName) + '</div>';
+    h += '<button class="btn btn-g btn-sm" id="btn-logout" style="margin-top:6px">Logout</button>';
+  }
+  h+='</div><div class="hdr-sub mono" style="align-self:flex-end">'+n+' wf'+(n!==1?'s':'')+'</div></div>';
+  
   h+='<div class="grid">';
   for(var i=0;i<n;i++){
     var w=data.workflows[i];
@@ -187,6 +264,10 @@ function rHub(){
   h+='<div style="text-align:center;padding:30px 0 10px;font-size:10px;color:#333" class="mono">workflow hub \u00b7 pwa</div>';
   $.innerHTML=h;
 
+  // Login Events
+  if(document.getElementById('btn-login')) document.getElementById('btn-login').onclick = login;
+  if(document.getElementById('btn-logout')) document.getElementById('btn-logout').onclick = logout;
+
   $.querySelectorAll('[data-i]').forEach(function(el){
     el.addEventListener('click',function(e){
       if(e.target.closest('[data-edit]')||e.target.closest('[data-del]'))return;
@@ -203,10 +284,14 @@ function rHub(){
   $.querySelectorAll('[data-del]').forEach(function(el){
     el.addEventListener('click',function(e){
       e.stopPropagation();
-      showDlg("Workflow l\u00f6schen?","Alle Daten werden gel\u00f6scht.",function(){
+      showDlg("Workflow l\u00f6schen?","Alle Daten werden gel\u00f6scht.",async function(){
         var idx=+el.dataset.del;
         for(var k in data.checks)if(k.indexOf("w"+idx)===0)delete data.checks[k];
-        data.workflows.splice(idx,1);save(data);R();
+        var wfToDelete = data.workflows[idx];
+        data.workflows.splice(idx,1);
+        save(data);
+        R();
+        await cloudDelete(wfToDelete); // In der Cloud löschen
       });
     });
   });
@@ -218,7 +303,6 @@ function rHub(){
 
 // ── WORKFLOW VIEW ──
 function rWf(){
-  data=load();
   var w=data.workflows[curWf];
   if(!w){view="hub";R();return}
   var pfx="w"+curWf;
@@ -294,8 +378,8 @@ function rWf(){
   var bb=document.getElementById('wf-back');if(bb)bb.onclick=function(){view="hub";R()};
   $.querySelectorAll('[data-tab]').forEach(function(el){el.onclick=function(){curTab=el.dataset.tab;R()}});
   $.querySelectorAll('[data-var]').forEach(function(el){el.onclick=function(){curVar=+el.dataset.var;R()}});
-  $.querySelectorAll('[data-phk]').forEach(function(el){el.onclick=function(){togC(data,'x'+el.dataset.phk);R()}});
-  $.querySelectorAll('[data-sk]').forEach(function(el){el.onclick=function(){togC(data,el.dataset.sk);R()}});
+  $.querySelectorAll('[data-phk]').forEach(function(el){el.onclick=function(){togC(data,'x'+el.dataset.phk)}});
+  $.querySelectorAll('[data-sk]').forEach(function(el){el.onclick=function(){togC(data,el.dataset.sk)}});
   var rb=document.getElementById('wf-reset');
   if(rb)rb.onclick=function(){
     var v=w.variants[curVar];
@@ -305,9 +389,8 @@ function rWf(){
     }
     save(data);R();
   };
-  // Bind material events
   setTimeout(function(){
-    $.querySelectorAll('[data-mk]').forEach(function(el){el.onclick=function(){togC(data,el.dataset.mk);R()}});
+    $.querySelectorAll('[data-mk]').forEach(function(el){el.onclick=function(){togC(data,el.dataset.mk)}});
     var mr=document.getElementById('mat-reset');
     if(mr)mr.onclick=function(){for(var i=0;i<w.materials.length;i++)delete data.checks[pfx+'m'+i];save(data);R()};
   },0);
@@ -447,7 +530,7 @@ function bindBld(){
     el.onclick=function(){var x=el.dataset.ds.split('-');b.variants[+x[0]].phases[+x[1]].steps.splice(+x[2],1);R()};
   });
 
-  document.getElementById('b-save').onclick=function(){
+  document.getElementById('b-save').onclick=async function(){
     if(!b.name.trim()){alert('Bitte einen Namen eingeben.');return}
     for(var vi=0;vi<b.variants.length;vi++){
       for(var pi=0;pi<b.variants[vi].phases.length;pi++){
@@ -456,16 +539,30 @@ function bindBld(){
       }
     }
     b.materials=(b.materials||[]).filter(function(m){return m.name.trim()});
-    if(view==="builder-edit"&&editIdx!==null)data.workflows[editIdx]=b;
+    
+    // Beim Speichern prüfen wir, ob es ein Update oder Neu ist
+    if(view==="builder-edit"&&editIdx!==null){
+      b.fbId = data.workflows[editIdx].fbId; // ID beibehalten!
+      data.workflows[editIdx]=b;
+    }
     else data.workflows.push(b);
-    save(data);view="hub";R();
+    
+    save(data);
+    view="hub";
+    R(); // Direkt lokal anzeigen (fühlt sich schneller an)
+    await cloudSave(b); // Im Hintergrund in die Cloud laden
   };
 
   var db=document.getElementById('b-del');
   if(db)db.onclick=function(){
-    showDlg("Workflow l\u00f6schen?","Unwiderruflich.",function(){
+    showDlg("Workflow l\u00f6schen?","Unwiderruflich.",async function(){
       for(var k in data.checks)if(k.indexOf("w"+editIdx)===0)delete data.checks[k];
-      data.workflows.splice(editIdx,1);save(data);view="hub";R();
+      var wfToDelete = data.workflows[editIdx];
+      data.workflows.splice(editIdx,1);
+      save(data);
+      view="hub";
+      R();
+      await cloudDelete(wfToDelete); // In der Cloud löschen
     });
   };
 }
@@ -480,7 +577,6 @@ function showDlg(t,m,fn){
 
 R();
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});
-})();
 </script>
 </body>
 </html>
