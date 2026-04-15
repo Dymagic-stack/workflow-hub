@@ -3,6 +3,7 @@
   "short_name": "Workflows",
   "description": "Persönlicher Workflow Hub",
   "start_url": "/workflow-hub/index.html",
+  "scope": "/workflow-hub/",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#0a0a0a",
