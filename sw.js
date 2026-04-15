@@ -1,8 +1,8 @@
 const CACHE_NAME = 'workflow-hub-v1';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json'
+  '/workflow-hub/',
+  '/workflow-hub/index.html',
+  '/workflow-hub/manifest.json'
 ];
 
 // Install: cache core assets
