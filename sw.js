@@ -24,7 +24,17 @@ self.addEventListener('activate', e => {
 });
 
 // Fetch: network-first, fallback to cache
+// POST-Requests und externe APIs (Firebase, Google) werden nicht gecacht
 self.addEventListener('fetch', e => {
+  const url = new URL(e.request.url);
+  if (
+    e.request.method !== 'GET' ||
+    url.hostname.includes('googleapis.com') ||
+    url.hostname.includes('firebase') ||
+    url.hostname.includes('gstatic.com') ||
+    url.hostname.includes('google.com')
+  ) return;
+
   e.respondWith(
     fetch(e.request)
       .then(res => {
