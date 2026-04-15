@@ -143,6 +143,7 @@ body{padding:0 0 env(safe-area-inset-bottom);min-height:100dvh}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+import { signInWithRedirect, getRedirectResult } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB_1WIDAnWVi5HO0CzFc3sUS8yomEDXvgs",
@@ -171,6 +172,8 @@ var currentUser = null;
 var view="hub",curWf=null,curVar=0,curTab="wf",editIdx=null,builder=null;
 var $=document.getElementById("app");
 
+getRedirectResult(auth).catch(e => console.error("Redirect error:", e));
+
 // ── FIREBASE AUTH & CLOUD SYNC ──
 onAuthStateChanged(auth, async (user) => {
   currentUser = user;
@@ -183,12 +186,11 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 async function login() {
-  try { await signInWithPopup(auth, provider); } catch (e) { console.error("Login Fehler:", e); }
-}
-
-async function logout() {
-  await signOut(auth);
-  location.reload();
+  try { 
+    await signInWithRedirect(auth, provider); 
+  } catch (e) { 
+    console.error("Login Fehler:", e); 
+  }
 }
 
 async function syncFromCloud() {
