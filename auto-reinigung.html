@@ -1,104 +1,255 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#0a0a0a">
-  <title>Auto Reinigung – Workflow Hub</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    :root {
-      --bg: #0a0a0a;
-      --surface: #151515;
-      --border: #222;
-      --text: #e8e8e8;
-      --text-muted: #777;
-      --accent: #c9ff57;
-      --accent-dim: rgba(201, 255, 87, 0.08);
-      --radius: 14px;
-    }
-
-    html, body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    body {
-      padding: 20px;
-      padding-top: env(safe-area-inset-top, 20px);
-      min-height: 100dvh;
-    }
-
-    /* Back link */
-    .back {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--text-muted);
-      text-decoration: none;
-      padding: 8px 0;
-      margin-bottom: 24px;
-    }
-
-    .back:active { color: var(--accent); }
-
-    .back svg {
-      width: 16px;
-      height: 16px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    h1 {
-      font-size: 24px;
-      font-weight: 700;
-      letter-spacing: -0.3px;
-      margin-bottom: 24px;
-    }
-
-    .placeholder {
-      background: var(--surface);
-      border: 1px dashed #2a2a2a;
-      border-radius: var(--radius);
-      padding: 40px 20px;
-      text-align: center;
-      color: var(--text-muted);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      line-height: 1.6;
-    }
-
-    .placeholder em {
-      display: block;
-      margin-top: 8px;
-      font-size: 11px;
-      color: #444;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Autopflege">
+<title>Mazda 3 Nakama Pflege</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#f8f9fa;color:#1a1a2e;line-height:1.5;min-height:100vh}
+.c{max-width:600px;margin:0 auto;padding:16px 16px 80px}
+h1{font-size:20px;font-weight:700;letter-spacing:-0.02em}
+.sub{font-size:13px;color:#6b7280;margin-top:2px}
+.tabs{display:flex;margin:16px 0;border-bottom:2px solid #e5e7eb}
+.tab{flex:1;padding:10px 8px;font-size:14px;font-weight:500;color:#9ca3af;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer;text-align:center}
+.tab.on{font-weight:700;color:#1a1a2e;border-bottom-color:#1a1a2e}
+.wsel{display:flex;gap:6px;margin-bottom:14px}
+.wb{flex:1;padding:10px 6px;font-size:12px;font-weight:500;color:#6b7280;background:#f3f4f6;border:none;border-radius:8px;cursor:pointer;text-align:center;line-height:1.3}
+.wb.on{font-weight:700;color:#fff;background:#1a1a2e}
+.wb .d{font-size:11px;opacity:.7;margin-top:2px}
+.pbc{background:#e5e7eb;border-radius:3px;height:5px;margin-bottom:16px;overflow:hidden}
+.pbf{height:100%;background:#1a1a2e;border-radius:3px;transition:width .3s}
+.pbf.dn{background:#22c55e}
+.pi{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#f3f4f6;border-radius:8px;margin-bottom:8px;font-size:13px}
+.pc{font-weight:700}.pc.dn{color:#16a34a}
+.ph{margin-bottom:6px;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb}
+.ph.dn{border-color:#bbf7d0}
+.phh{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:#f9fafb;cursor:pointer;user-select:none;min-height:48px}
+.ph.dn .phh{background:#f0fdf4}
+.phl{display:flex;align-items:center;gap:8px}
+.arr{font-size:10px;transition:transform .15s;display:inline-block;color:#6b7280}
+.arr.op{transform:rotate(90deg)}
+.phn{font-size:14px;font-weight:700}
+.phck{font-size:12px;color:#16a34a}
+.phr{display:flex;gap:8px;align-items:center}
+.phcn{font-size:12px;color:#9ca3af}
+.pht{font-size:11px;color:#6b7280;background:#e5e7eb;padding:2px 8px;border-radius:4px;font-weight:600;white-space:nowrap}
+.phi{padding:4px 0;border-top:1px solid #e5e7eb}
+.ci{display:flex;gap:12px;padding:10px 14px;cursor:pointer;align-items:flex-start;min-height:44px;transition:opacity .15s}
+.ci.ck{opacity:.45}
+.cb{width:22px;height:22px;min-width:22px;border-radius:5px;border:2px solid #d1d5db;display:flex;align-items:center;justify-content:center;margin-top:1px;font-size:13px;color:#fff;font-weight:700}
+.cb.ck{background:#22c55e;border:none}
+.ct{font-size:14px;line-height:1.45;flex:1}
+.ci.ck .ct{text-decoration:line-through;color:#9ca3af}
+.mi{display:flex;gap:12px;padding:12px;margin-bottom:4px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;cursor:pointer;min-height:48px;transition:all .15s}
+.mi.ck{opacity:.5;background:#f9fafb}
+.mn{font-size:14px;font-weight:600;line-height:1.3}
+.mi.ck .mn{text-decoration:line-through}
+.mp{font-size:12px;color:#6b7280;font-weight:600;white-space:nowrap;margin-left:8px}
+.mnt{font-size:12px;color:#6b7280;margin-top:3px;line-height:1.4}
+.mh{display:flex;justify-content:space-between;align-items:baseline}
+.hi{display:flex;gap:10px;padding:12px;margin-bottom:4px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;align-items:flex-start}
+.hn{font-size:14px;font-weight:600}
+.hnt{font-size:12px;color:#6b7280;margin-top:3px}
+.sb{font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;white-space:nowrap;margin-top:2px;flex-shrink:0}
+.ch{font-size:13px;font-weight:600;color:#6b7280;margin:14px 0 6px}
+.stt{font-size:16px;font-weight:700;margin:0 0 10px}
+.ib{padding:12px 14px;border-radius:8px;font-size:12px;line-height:1.5;margin-bottom:16px}
+.ibg{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534}
+.iby{background:#fffbeb;border:1px solid #fde68a;color:#92400e}
+.rb{margin-top:12px;padding:10px 16px;font-size:13px;color:#6b7280;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:8px;cursor:pointer;min-height:44px}
+.hid{display:none}
+</style>
 </head>
 <body>
+<div class="c">
+<h1 id="title">Mazda 3 Nakama &mdash; Pflegeworkflows</h1>
+<div class="sub">Blue Reflex &middot; SB-Waschbox Knauber Troisdorf</div>
+<div class="tabs">
+<button class="tab on" id="tb1" onclick="sTab('mat')">Materialliste</button>
+<button class="tab" id="tb2" onclick="sTab('wf')">Workflows</button>
+</div>
+<div id="vm"></div>
+<div id="vw" class="hid"></div>
+<div class="ib iby" style="margin-top:24px">
+<b>Hinweis zur SB-Box:</b> Deine eigenen Eimer und Handschuhe mitbringen. Der HD-Strahler der Box ist nur zum Vor-/Absp&uuml;len. Die B&uuml;rsten und Schw&auml;mme der SB-Box NIEMALS am Lack verwenden &mdash; die schleppen den Dreck aller Vorg&auml;nger mit.
+</div>
+</div>
+<script>
+(function(){
 
-  <a href="../index.html" class="back">
-    <svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-    hub
-  </a>
+var N=[
+["Waschhandschuh (Mikrofaser/Lammfell)","8-15\u20ac","KEIN Schwamm \u2014 Schw\u00e4mme schleifen Schmutz \u00fcber den Lack","A"],
+["2x Wascheimer (20L) + Grit Guards","25-35\u20ac","Two-Bucket-Method: 1x Wasch, 1x Sp\u00fcl. Grit Guards halten Dreck am Boden","A"],
+["Autoshampoo (z.B. Koch Chemie Nano Magic Shampoo)","10-15\u20ac","pH-neutral, sch\u00e4umt gut, hinterl\u00e4sst leichten Schutzfilm","A"],
+["Spr\u00fchversiegelung (z.B. Sonax Brilliant Shine Detailer)","12-18\u20ac","Nach jeder W\u00e4sche auftragen \u2014 Schutz + Glanz + Wasserabperleffekt","A"],
+["2-3x Mikrofasert\u00fccher (mind. 400 GSM)","15-25\u20ac","Zum Trocknen. Niemals kreisen \u2014 nur tupfen oder in eine Richtung ziehen","A"],
+["Felgenreiniger (z.B. Koch Chemie Reactive Wheel Cleaner)","12-18\u20ac","S\u00e4urefrei, pH-neutral. Dein Bremsstaub von Brembo-Bel\u00e4gen braucht was Ordentliches","F"],
+["Felgenb\u00fcrste (z.B. EZ Detail Brush)","8-12\u20ac","Ersetzt deine aktuelle \u2014 lange, flexible B\u00fcrste f\u00fcr Speichen und Felgenbett","F"],
+["Reifendressing (z.B. Koch Chemie PSS)","10-15\u20ac","Mattfinish, kein Hochglanz-Schleim","F"],
+["Innenraum-APC (z.B. Koch Chemie Mehrzweckreiniger)","8-12\u20ac","F\u00fcr Stoff-Sitzfl\u00e4chen und Kunststoffe. Verd\u00fcnnbar","I"],
+["Kunststoffpflege innen (z.B. Koch Chemie Plast Star)","10-14\u20ac","F\u00fcr Dashboard, T\u00fcrverkleidungen. Matt, kein Hochglanz-Schmierfilm","I"],
+["Glasreiniger (z.B. Sonax Xtreme)","5-8\u20ac","Streifenfrei. Windschutzscheibe innen wird massiv untersch\u00e4tzt","I"],
+["Applikator-Pads (Mikrofaser, 5er Pack)","5-8\u20ac","Zum Auftragen von Versiegelung, Reifendressing, Kunststoffpflege","Z"],
+["Einhell CE-CP 18/150 Li (DA Poliermaschine)","55-75\u20ac","Passt in dein Power X-Change System. 150mm Teller, Exzenterhub","P"],
+["Polierpads 150mm Set (Medium Cut + Finish)","15-20\u20ac","Medium Cut (orange/gelb) f\u00fcr Swirl-Entfernung, Finish (schwarz/blau) f\u00fcr Hochglanz","P"],
+["Politur Medium Cut (z.B. Menzerna 2500)","12-18\u20ac","Entfernt Swirls und leichte Kratzer. F\u00fcr Blue Reflex ideal","P"],
+["Politur Finish (z.B. Menzerna 3500)","12-18\u20ac","Nach Medium Cut f\u00fcr spiegelnden Abschluss","P"],
+["IPA / Entfettung (Isopropanol 1:1 mit Wasser)","5-8\u20ac","Politurreste entfernen vor Versiegelung","P"],
+["Glaspolitur (z.B. Sonax Profiline)","10-15\u20ac","F\u00fcr Scheibenwischer-Kratzer und Wasserflecken","S"],
+["Filzpad f\u00fcr Glaspolitur (75mm oder Handpad)","5-10\u20ac","Kann auf den Einhell mit Adapter oder per Hand genutzt werden","S"]
+];
 
-  <h1>🚗 Auto Reinigung</h1>
+var H=[
+["Bremsenreiniger (Aral Intensiv)","Gut f\u00fcr hartn\u00e4ckige Felgenstellen und Bremssattel-Reinigung","keep"],
+["Nigrin Bremsenreiniger","Schwach \u2014 als Backup behalten","backup"],
+["Detailing-B\u00fcrsten (2x)","Perfekt f\u00fcr L\u00fcftungsschlitze, N\u00e4hte, Spalten","keep"],
+["Aral Innenraumreiniger","F\u00fcr schnelle Zwischenreinigung brauchbar","keep"],
+["Nigrin Lederpflege","F\u00fcr die Kunstleder-Seitenteile geeignet","keep"],
+["Holzb\u00fcrste (Leder)","F\u00fcr Fu\u00dfmatten-Reinigung, NICHT f\u00fcr Leder","repurpose"],
+["Sonax Alcantara & Polsterreiniger","Geschlossenes Spr\u00fchdosensystem. Auf Mikrofasertuch aufsch\u00e4umen","caution"],
+["Politur (hart)","F\u00fcr Lack NICHT verwenden. Nur f\u00fcr Kunststoff-Kratzer","caution"],
+["Einhell Oszillations-Multitool + Akkus","NICHT zum Polieren \u2014 zerst\u00f6rt Klarlack. Akkus passen f\u00fcr CE-CP","caution"]
+];
 
-  <div class="placeholder">
-    Hier kommt dein Workflow-Inhalt hin.<br>
-    Ersetze diesen Platzhalter mit deiner HTML.
-    <em>workflows/auto-reinigung.html</em>
-  </div>
+var CK={"A":"Au\u00dfen","F":"Felgen","I":"Innen","P":"Polieren","S":"Scheiben","Z":"Zubeh\u00f6r"};
+var CO=["A","F","I","P","S","Z"];
+var SL={keep:["#e8f5e9","#2e7d32","Behalten"],backup:["#fff8e1","#f57f17","Backup"],repurpose:["#e3f2fd","#1565c0","Umfunktionieren"],caution:["#fce4ec","#c62828","Vorsicht"]};
 
+var W=[
+{id:"ini",ti:"Initialaufbereitung",du:"3.5-4h",fr:"Einmalig",st:[
+["Vorbereitung","10 min",["Alles Equipment in die Box laden","Matten rausnehmen, Kofferraum leerr\u00e4umen","M\u00fcnzen/Karte bereithalten \u2014 ca. 3-4 Waschg\u00e4nge am HD-Strahler"]],
+["Felgen & Radh\u00e4user","25 min",["Felgenreiniger auf alle 4 Felgen spr\u00fchen \u2014 einwirken lassen","Mit Felgenb\u00fcrste jede Speiche und Felgenbett durcharbeiten","Radh\u00e4user mit HD-Strahler abspr\u00fchen","Bei hartn\u00e4ckigem Bremsstaub Bremsenreiniger (Aral) gezielt einsetzen","Reifen mit APC und Holzb\u00fcrste schrubben"]],
+["Vorw\u00e4sche","10 min",["Gesamtes Auto mit HD-Strahler von oben nach unten","Fokus auf Schweller, Radl\u00e4ufe, Hecksch\u00fcrze","Insektenreste an Front separat einweichen lassen"]],
+["Hauptw\u00e4sche (Two-Bucket)","25 min",["Eimer 1: Shampoo-L\u00f6sung anmischen","Eimer 2: Klares Sp\u00fclwasser mit Grit Guard","Waschhandschuh in Shampoo tauchen, ein Panel waschen (Dach zuerst)","Handschuh im Sp\u00fcleimer am Grit Guard ausreiben, zur\u00fcck in Shampoo","NIEMALS den Handschuh vom Boden direkt wieder auf den Lack","Schweller und untere Bereiche ZULETZT"]],
+["Sp\u00fclen & Trocknen","15 min",["Gesamtes Auto mit HD-Strahler absp\u00fclen \u2014 oben nach unten","Mikrofasertuch flach auflegen und ziehen, NICHT kreisen","T\u00fcrfalze, Tankdeckel, Kofferraumkante nicht vergessen"]],
+["Lack-Dekon","20 min",["Lack mit Hand \u00fcber d\u00fcnne Plastikt\u00fcte abtasten \u2014 rau = Kontamination","Falls rau: Reinigungsknete mit Gleitmittel \u00fcber betroffene Stellen","Danach nochmal absp\u00fclen und trocknen","Optional: Kann auch bei der ersten Pr\u00e4zisionsw\u00e4sche nachgeholt werden"]],
+["Lackpolitur","45 min",["WICHTIG: Nur auf sauberem, trockenem Lack polieren","Nicht in direkter Sonne arbeiten","Medium Cut Pad auf Einhell CE-CP, erbsengro\u00dfe Menge Menzerna 2500","Politur bei niedriger Stufe verteilen (Kreuzstich), dann Stufe erh\u00f6hen","Panel f\u00fcr Panel \u2014 ca. 40x40cm. Dach, Motorhaube, Seiten, Heck","3-4 langsame Durchg\u00e4nge pro Abschnitt, leichter Druck","Politurreste abnehmen, Ergebnis pr\u00fcfen (Taschenlampe im flachen Winkel)","Bei Bedarf: Finish-Pad + Menzerna 3500 f\u00fcr Hochglanz","IPA-Mischung (1:1 Isopropanol/Wasser) auf Mikrofasertuch, Lack abwischen","IPA entfernt Politurf\u00fcller \u2014 zeigt das echte Ergebnis"]],
+["Scheibenpolitur","20 min",["Scheiben auf Kratzer und Wasserflecken pr\u00fcfen (Gegenlicht)","Glaspolitur auf Filzpad \u2014 d\u00fcnn und gleichm\u00e4\u00dfig","Per Hand oder mit Einhell in \u00fcberlappenden Bahnen","Fokus auf Wischerbereiche \u2014 meiste Mikrokratzer","Reste abnehmen und Ergebnis pr\u00fcfen","Bei starken Wasserflecken: Mehrere Durchg\u00e4nge"]],
+["Versiegelung","15 min",["Spr\u00fchversiegelung Panel f\u00fcr Panel auftragen","Mit Mikrofasertuch gleichm\u00e4\u00dfig verteilen und abnehmen","Nicht in der Sonne \u2014 darf nicht antrocknen"]],
+["Innenraum \u2014 Tiefenreinigung","40 min",["Saugen: Sitze, Fu\u00dfraum, Kofferraum, unter den Sitzen","Fu\u00dfmatten separat saugen + APC + Holzb\u00fcrste","Kunststoffe: APC auf Mikrofasertuch (nie direkt spr\u00fchen!)","Detailing-B\u00fcrsten f\u00fcr L\u00fcftungsd\u00fcsen und Spalten","Stoffsitze: Polsterreiniger aufspr\u00fchen, einarbeiten, trocknen","Kunstleder-Seiten: Nigrin Lederpflege d\u00fcnn auftragen","Dashboard + T\u00fcrverkleidungen: Kunststoffpflege (matt)","Scheiben innen: Glasreiniger, zwei Durchg\u00e4nge"]],
+["Finish","10 min",["Reifendressing mit Applikator-Pad auftragen","Rundgang: Wasserflecken? Vergessene Stellen?","Matten zur\u00fccklegen, Kofferraum einr\u00e4umen"]]
+]},
+{id:"pre",ti:"Pr\u00e4zisionsw\u00e4sche",du:"1-1.5h",fr:"1x monatlich",st:[
+["Vorbereitung","5 min",["Equipment-Check: Eimer, Handschuh, Shampoo, Versiegelung","Matten raus, lose Gegenst\u00e4nde entfernen"]],
+["Felgen","15 min",["Felgenreiniger aufspr\u00fchen, einwirken, B\u00fcrste durcharbeiten","HD-Strahler absp\u00fclen","Bei Bedarf Bremsenreiniger gezielt einsetzen"]],
+["Vorw\u00e4sche + Hauptw\u00e4sche","25 min",["HD-Strahler: komplett abspr\u00fchen","Two-Bucket-W\u00e4sche wie bei Initialaufbereitung","Reihenfolge: Dach, Scheiben, Motorhaube, Seiten, Heck, Schweller"]],
+["Sp\u00fclen, Trocknen & Versiegeln","15 min",["Absp\u00fclen mit HD-Strahler","Trocknen (Mikrofaser, ziehen nicht kreisen)","Spr\u00fchversiegelung auftragen und abnehmen"]],
+["Innenraum","20 min",["Saugen: Fu\u00dfraum, Sitze, Kofferraum","Kunststoffe feucht abwischen","Scheiben innen bei Bedarf","Detailing-B\u00fcrsten durch L\u00fcftungen und Spalten"]],
+["Finish","5 min",["Reifendressing auftragen","Kontrollrundgang"]]
+]},
+{id:"qck",ti:"Schnellw\u00e4sche",du:"30-45 min",fr:"Nach Bedarf",st:[
+["Au\u00dfen","20 min",["HD-Strahler: Groben Dreck abspr\u00fchen","One-Bucket-W\u00e4sche \u2014 reicht wenn Versiegelung steht","Absp\u00fclen, trocknen","Spr\u00fchversiegelung optional"]],
+["Felgen (bei Bedarf)","10 min",["Nur bei sichtbarem Bremsstaub \u2014 Felgenreiniger + B\u00fcrste","Sonst nur HD-Strahler"]],
+["Innenraum (Quick)","10 min",["M\u00fcll raus, schnell durchsaugen","Feuchtes Mikrofasertuch \u00fcber Dashboard","Fertig \u2014 monatlicher Termin holt den Rest nach"]]
+]}
+];
+
+var aT="mat",aW="ini",S={};
+function lS(){try{S=JSON.parse(localStorage.getItem("nk3")||"{}")}catch(e){S={}}}
+function sS(){try{localStorage.setItem("nk3",JSON.stringify(S))}catch(e){}}
+function iC(k){return !!S[k]}
+function tg(k){if(S[k])delete S[k];else S[k]=1;sS()}
+
+window.sTab=function(t){
+aT=t;
+document.getElementById("tb1").className="tab"+(t==="mat"?" on":"");
+document.getElementById("tb2").className="tab"+(t==="wf"?" on":"");
+document.getElementById("vm").className=t==="mat"?"":"hid";
+document.getElementById("vw").className=t==="wf"?"":"hid";
+if(t==="wf")rW();
+};
+
+function rM(){
+var e=document.getElementById("vm");
+var tn=N.length,cn=0;
+for(var i=0;i<tn;i++)if(iC("m"+i))cn++;
+var h='<div class="ib ibg"><b>Invest:</b> ca. 230-310\u20ac inkl. Poliermaschine. Ohne Polierer ca. 120-180\u20ac.</div>';
+h+='<div class="stt" style="color:#dc2626">Muss neu \u2014 Einkaufsliste ('+cn+'/'+tn+')</div>';
+for(var ci=0;ci<CO.length;ci++){
+var ck=CO[ci],items=[];
+for(var i=0;i<N.length;i++)if(N[i][3]===ck)items.push(i);
+if(!items.length)continue;
+h+='<div class="ch">'+CK[ck]+'</div>';
+for(var j=0;j<items.length;j++){
+var idx=items[j],it=N[idx],c=iC("m"+idx);
+h+='<div class="mi'+(c?" ck":"")+'" onclick="tM('+idx+')">';
+h+='<div class="cb'+(c?" ck":"")+'">'+(c?"\u2713":"")+'</div>';
+h+='<div style="flex:1"><div class="mh"><span class="mn">'+it[0]+'</span><span class="mp">'+it[1]+'</span></div>';
+h+='<div class="mnt">'+it[2]+'</div></div></div>';
+}}
+h+='<div class="stt" style="margin-top:24px;color:#16a34a">Vorhanden \u2014 Bestandsaufnahme</div>';
+for(var i=0;i<H.length;i++){
+var it=H[i],sc=SL[it[2]];
+h+='<div class="hi"><span class="sb" style="background:'+sc[0]+';color:'+sc[1]+'">'+sc[2]+'</span>';
+h+='<div><div class="hn">'+it[0]+'</div><div class="hnt">'+it[1]+'</div></div></div>';
+}
+e.innerHTML=h;
+}
+window.tM=function(i){tg("m"+i);rM()};
+
+function gW(){for(var i=0;i<W.length;i++)if(W[i].id===aW)return W[i];return W[0]}
+
+function rW(){
+var e=document.getElementById("vw"),wf=gW();
+var h='<div class="wsel">';
+for(var i=0;i<W.length;i++){
+h+='<button class="wb'+(aW===W[i].id?" on":"")+'" onclick="sW(\''+W[i].id+'\')">';
+h+='<div>'+W[i].ti+'</div><div class="d">'+W[i].du+'</div></button>';
+}
+h+='</div>';
+var tot=0,chk=0;
+for(var si=0;si<wf.st.length;si++)for(var ii=0;ii<wf.st[si][2].length;ii++){tot++;if(iC(wf.id+si+"_"+ii))chk++}
+var dn=chk===tot&&tot>0;
+h+='<div class="pi"><span><b>'+wf.ti+'</b> \u00b7 '+wf.fr+'</span>';
+h+='<span class="pc'+(dn?" dn":"")+'">'+chk+'/'+tot+'</span></div>';
+h+='<div class="pbc"><div class="pbf'+(dn?" dn":"")+'" style="width:'+(tot>0?Math.round(chk/tot*100):0)+'%"></div></div>';
+
+for(var si=0;si<wf.st.length;si++){
+var s=wf.st[si],pk=wf.id+"p"+si,exp=!iC("x"+pk),pc=0;
+for(var ii=0;ii<s[2].length;ii++)if(iC(wf.id+si+"_"+ii))pc++;
+var pd=pc===s[2].length;
+h+='<div class="ph'+(pd?" dn":"")+'">';
+h+='<div class="phh" onclick="tP(\''+pk+'\')">';
+h+='<div class="phl"><span class="arr'+(exp?" op":"")+'">&#9654;</span>';
+h+='<span class="phn">'+s[0]+'</span>';
+if(pd)h+='<span class="phck">\u2713</span>';
+h+='</div><div class="phr"><span class="phcn">'+pc+'/'+s[2].length+'</span>';
+h+='<span class="pht">'+s[1]+'</span></div></div>';
+if(exp){
+h+='<div class="phi">';
+for(var ii=0;ii<s[2].length;ii++){
+var ik=wf.id+si+"_"+ii,ic=iC(ik);
+h+='<div class="ci'+(ic?" ck":"")+'" onclick="tS(\''+wf.id+'\','+si+','+ii+')">';
+h+='<div class="cb'+(ic?" ck":"")+'">'+(ic?"\u2713":"")+'</div>';
+h+='<span class="ct">'+s[2][ii]+'</span></div>';
+}
+h+='</div>';
+}
+h+='</div>';
+}
+h+='<button class="rb" onclick="rR()">Checkboxen zur\u00fccksetzen</button>';
+e.innerHTML=h;
+}
+
+window.sW=function(id){aW=id;rW()};
+window.tP=function(pk){tg("x"+pk);rW()};
+window.tS=function(wid,si,ii){tg(wid+si+"_"+ii);rW()};
+window.rR=function(){
+var wf=gW();
+for(var si=0;si<wf.st.length;si++){
+for(var ii=0;ii<wf.st[si][2].length;ii++)delete S[wf.id+si+"_"+ii];
+delete S["x"+wf.id+"p"+si];
+}
+sS();rW();
+};
+
+lS();rM();
+
+})();
+</script>
 </body>
 </html>
