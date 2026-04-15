@@ -193,6 +193,11 @@ async function login() {
   }
 }
 
+async function logout() {
+  await signOut(auth);
+  location.reload();
+}
+
 async function syncFromCloud() {
   if (!currentUser) return;
   const q = query(collection(db, "workflows"), where("authorId", "==", currentUser.uid));
