@@ -183,14 +183,11 @@ var $=document.getElementById("app");
 getRedirectResult(auth).catch(e => console.error("Redirect error:", e));
 
 // ── FIREBASE AUTH & CLOUD SYNC ──
-onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(auth, (user) => {
   currentUser = user;
-  if (user) {
-    await syncFromCloud(); // ruft bereits R() am Ende
-  } else {
-    data.workflows = load().workflows; // Lade lokale Daten, wenn ausgeloggt
-    R();
-  }
+  if (!user) data.workflows = load().workflows;
+  R(); // Sofort rendern – Auth-Zustand ist bekannt
+  if (user) syncFromCloud(); // Cloud-Daten im Hintergrund nachladen
 });
 
 async function login() {
@@ -204,11 +201,15 @@ async function logout() {
 
 async function syncFromCloud() {
   if (!currentUser) return;
-  const q = query(collection(db, "workflows"), where("authorId", "==", currentUser.uid));
-  const snap = await getDocs(q);
-  data.workflows = snap.docs.map(d => ({ fbId: d.id, ...d.data() }));
-  save(data); // Aktualisiere den lokalen Cache
-  R();
+  try {
+    const q = query(collection(db, "workflows"), where("authorId", "==", currentUser.uid));
+    const snap = await getDocs(q);
+    data.workflows = snap.docs.map(d => ({ fbId: d.id, ...d.data() }));
+    save(data);
+    R();
+  } catch(e) {
+    console.error("Cloud sync Fehler:", e);
+  }
 }
 
 async function cloudSave(workflow) {
