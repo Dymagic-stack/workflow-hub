@@ -155,7 +155,7 @@ import { getAuth, GoogleAuthProvider, onAuthStateChanged, signOut, signInWithRed
          
 const firebaseConfig = {
   apiKey: "AIzaSyB_1WIDAnWVi5HO0CzFc3sUS8yomEDXvgs",
-  authDomain: "workflow-hub-8b61c.firebaseapp.com",
+  authDomain: "workflow-hub-8b61c.web.app",
   projectId: "workflow-hub-8b61c",
   storageBucket: "workflow-hub-8b61c.firebasestorage.app",
   messagingSenderId: "673301872066",
@@ -163,11 +163,11 @@ const firebaseConfig = {
   measurementId: "G-KYQLTFKMBC"
 };
 
-// Initialisiere Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
+let db = null;
+function getDb() { if (!db) db = getFirestore(app); return db; }
 
 var DB="wfhub_v2";
 function load(){try{return JSON.parse(localStorage.getItem(DB))||{workflows:[],checks:{}}}catch(e){return{workflows:[],checks:{}}}}
@@ -186,8 +186,8 @@ getRedirectResult(auth).catch(e => console.error("Redirect error:", e));
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
   if (!user) data.workflows = load().workflows;
-  R(); // Sofort rendern – Auth-Zustand ist bekannt
-  if (user) syncFromCloud(); // Cloud-Daten im Hintergrund nachladen
+  R();
+  if (user) syncFromCloud();
 });
 
 async function login() {
@@ -202,7 +202,7 @@ async function logout() {
 async function syncFromCloud() {
   if (!currentUser) return;
   try {
-    const q = query(collection(db, "workflows"), where("authorId", "==", currentUser.uid));
+    const q = query(collection(getDb(), "workflows"), where("authorId", "==", currentUser.uid));
     const snap = await getDocs(q);
     data.workflows = snap.docs.map(d => ({ fbId: d.id, ...d.data() }));
     save(data);
@@ -213,22 +213,21 @@ async function syncFromCloud() {
 }
 
 async function cloudSave(workflow) {
-  if (!currentUser) return; // Wenn nicht eingeloggt, wird es ohnehin lokal durch save(data) gespeichert
+  if (!currentUser) return;
   const wfData = { ...workflow, authorId: currentUser.uid };
   const id = wfData.fbId;
-  delete wfData.fbId; // ID nicht ins Dokument mit abspeichern
-
+  delete wfData.fbId;
   if (id) {
-    await updateDoc(doc(db, "workflows", id), wfData);
+    await updateDoc(doc(getDb(), "workflows", id), wfData);
   } else {
-    await addDoc(collection(db, "workflows"), wfData);
+    await addDoc(collection(getDb(), "workflows"), wfData);
   }
   await syncFromCloud();
 }
 
 async function cloudDelete(workflow) {
   if (!currentUser || !workflow.fbId) return;
-  await deleteDoc(doc(db, "workflows", workflow.fbId));
+  await deleteDoc(doc(getDb(), "workflows", workflow.fbId));
   await syncFromCloud();
 }
 
@@ -589,6 +588,8 @@ function showDlg(t,m,fn){
 
 R();
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});
+window.login = login;
+window.logout = logout;
 </script>
 </body>
 </html>

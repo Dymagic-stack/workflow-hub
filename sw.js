@@ -1,11 +1,10 @@
-const CACHE_NAME = 'workflow-hub-v2';
+const CACHE_NAME = 'workflow-hub-v3';
 const ASSETS = [
-  '/workflow-hub/',
-  '/workflow-hub/index.html',
-  '/workflow-hub/manifest.json'
+  '/',
+  '/index.html',
+  '/manifest.json'
 ];
 
-// Install: cache core assets
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
@@ -13,7 +12,6 @@ self.addEventListener('install', e => {
   self.skipWaiting();
 });
 
-// Activate: clean old caches
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys =>
@@ -23,8 +21,6 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
-// Fetch: network-first, fallback to cache
-// POST-Requests und externe APIs (Firebase, Google) werden nicht gecacht
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (
